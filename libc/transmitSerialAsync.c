@@ -29,16 +29,24 @@ void disableTransmitCompleteInterruptHandler() {
 	UCSR0B &= ~(1<<TXCIE0);
 }
 
+void enableGlobalInterrupts() {
+	sei();
+}
+
+void disableGlobalInterrupts() {
+	cli();
+}
+
 void transmitSerialAsync(byte bytes[], callback transmitCompleteCallback) {
 	// if transmission in progress... don't do anything yet.  we will handle this later
 	transmission = bytes;
 	transmissionLength = strlen(bytes);
 	currentPosition = 0;
+	disableGlobalInterrupts();
 	stageNextByteForTransmission();
 	enableEmptyRegisterInterruptHandler();
 	enableTransmitCompleteInterruptHandler();
-
-	sei();
+	enableGlobalInterrupts();
 }
 
 /**

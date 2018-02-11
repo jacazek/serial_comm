@@ -24,6 +24,10 @@ void setUp() {
 	seiCallCount = 0;
 }
 
+void cli() {
+	
+}
+
 void sei() {
 	seiCallCount++;
 }

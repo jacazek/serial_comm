@@ -12,5 +12,6 @@
 DECLARE_ISR(USART0_UDRE_vect)
 DECLARE_ISR(USART0_TX_vect)
 extern void sei();
+extern void cli();
 
 #endif 
