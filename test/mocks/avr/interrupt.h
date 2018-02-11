@@ -3,7 +3,7 @@
 // Macro to create ISR function signature
 #define ISR(vector) void vector##_function()
 // Macro to declare an ISR
-#define DECLARE_ISR(vector) extern void vector##_function();
+#define DECLARE_ISR(vector) extern ISR(vector);
 
 /**
 	Declare interrupt service routines we would like to test
