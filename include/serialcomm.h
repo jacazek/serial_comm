@@ -8,14 +8,6 @@ struct SerialSettings {
 	short baudrate;
 };
 
-extern byte serialCheckRxComplete(void);
-extern byte serialCheckTxReady(void);
-extern byte serialRead(void);
-extern void serialWrite(byte DataOut);
-extern void serialWriteLine(byte DataOut[]);
-extern void serialWriteInt(int Dataout);
-extern void delayLong();
-extern void establishContact();
 extern void configureSerial(struct SerialSettings settings);
 extern void transmitSerialAsync(byte bytes[], callback transmitCompleteCallback);
 #endif

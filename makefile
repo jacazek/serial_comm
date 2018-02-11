@@ -11,7 +11,6 @@ SRCPATH = ./libc/
 DEPENDS = 
 BUILDPATH = ./build/
 OBJ_PATH = $(BUILDPATH)/
-TEST_BUILDPATH = ./test/build/
 DISTPATH = ./dist/
 
 
@@ -34,7 +33,6 @@ all: PATHS $(PROGRAM).a tests
 force_all: clean all
 .PHONY: force_all
 $(PROGRAM).a: $(PROGRAM).o
-	#$(CC) $(CFLAGS) $(LDFLAGS) $(LIBS)
 	$(AR) $(ARFLAGS) $(DISTPATH)lib$@ $(BUILDPATH)*.o
 
 $(PROGRAM).o: $(SRCPATH)
