@@ -13,4 +13,4 @@ or
 
 or run the test.py script in the example directory (may need privileged access)
 	
-	python ./example/test.py /dev/ttyACM0
+	python ./example/test.py /dev/[device]
