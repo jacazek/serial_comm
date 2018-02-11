@@ -10,8 +10,8 @@ LIBRARY = serialcomm
 MAKE_DIR = mkdir -p
 
 all: $(BUILDPATH) $(TESTS)
-
-
+force_all: clean all
+.PHONY: force_all
 $(TESTS): %_test: $(SRCPATH)%.c
 	#gcc -D TEST -D __AVR_ATmega2560__ -o $(BUILDPATH)$@.o $@.c $< ./Unity/unity.c -I/usr/lib/avr/include/ -I$(INCLUDEPATH)
 	gcc -D TEST -o $(BUILDPATH)$@.o $@.c $< ./Unity/unity.c -Imocks/ -I$(INCLUDEPATH)

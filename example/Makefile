@@ -1,6 +1,6 @@
 PROGRAM = main
-#MCU_TARGET     = atmega2560
-MCU_TARGET	= atmega2561
+MCU_TARGET     = atmega2560
+#MCU_TARGET	= atmega2561
 #MCU_TARGET     = atmega328p
 
 DEPENDS = serialcomm
@@ -19,6 +19,8 @@ override CFLAGS        = -g -Wall $(OPTIMIZE) -mmcu=$(MCU_TARGET)
 override LDFLAGS       = -Wl,-Map,$(PROGRAM).map
 
 all: $(PROGRAM).elf lst text eeprom
+force_all: clean all
+.PHONY: force_all
 clean:
 	rm -rf *.o *.hex *.bin *.srec *.elf *.map *.lst
 $(PROGRAM).elf: $(PROGRAM).c
@@ -94,7 +96,7 @@ pdf: $(PROGRAM).pdf
 
 # program the system
 program:
-	avrdude -p m2560 -P /dev/ttyACM0 -b 115200 -c stk500v2 -F -u -U flash:w:main.hex
-	#sudo avrdude -p m2561 -P /dev/ttyACM0 -b 19200 -c stk500v1 -F -u -U flash:w:$(BUILDPATH)main.hex
+	avrdude -p m2560 -P /dev/ttyACM0 -b 115200 -c stk500v2 -U flash:w:main.hex
+	#sudo avrdude -p m2561 -P /dev/ttyACM0 -b 19200 -c stk500v1 -U flash:w:$(BUILDPATH)main.hex
 
 

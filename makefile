@@ -30,7 +30,9 @@ override ARFLAGS       = rcs
 override CFLAGS        = -I$(INCLUDEPATH) -g -Wall -c $(OPTIMIZE) -mmcu=$(MCU_TARGET)
 override LDFLAGS       = -Wl,-Map,$(BUILDPATH)$(PROGRAM).map
 
-all: PATHS $(PROGRAM).a
+all: PATHS $(PROGRAM).a tests
+force_all: clean all
+.PHONY: force_all
 $(PROGRAM).a: $(PROGRAM).o
 	#$(CC) $(CFLAGS) $(LDFLAGS) $(LIBS)
 	$(AR) $(ARFLAGS) $(DISTPATH)lib$@ $(BUILDPATH)*.o
@@ -42,68 +44,12 @@ $(PROGRAM).o: $(SRCPATH)
 PATHS:
 	$(MAKE_DIR) $(DISTPATH) $(BUILDPATH) $(TEST_BUILDPATH)
 
+tests:
+	cd test && $(MAKE) 
+
+example:
+	cd example && $(MAKE)
+
 clean:
 	rm -rf $(DISTPATH) $(BUILDPATH)
-
-test: clean $(TESTS)
-
-$(TESTS): %_test: $(SRCPATH)%.c $(TEST_BUILDPATH)
-	gcc -D TEST -o $(TEST_BUILDPATH)$@.o ./test/$@.c $(TEST_DEPENDS) $< ../Unity/src/unity.c
-	$(TEST_BUILDPATH)$@.o
-
-$(TEST_BUILDPATH): PATHS
-
-lst:  $(BUILDPATH)$(PROGRAM).lst
-
-%.lst: %.elf
-	$(OBJDUMP) -h -S $< > $@
-
-
-
-# Rules for building the .text rom images
-text: hex bin srec
-
-hex:  $(BUILDPATH)$(PROGRAM).hex
-bin:  $(BUILDPATH)$(PROGRAM).bin
-srec: $(BUILDPATH)$(PROGRAM).srec
-
-%.hex: %.a
-	$(OBJCOPY) -j .text -j .data -O ihex $< $@
-
-%.srec: %.a
-	$(OBJCOPY) -j .text -j .data -O srec $< $@
-
-%.bin: %.a
-	$(OBJCOPY) -j .text -j .data -O binary $< $@
-
-
-
-
-# Every thing below here is used by avr-libc's build system and can be ignored
-# by the casual user.
-FIG2DEV                 = fig2dev
-EXTRA_CLEAN_FILES       = *.hex *.bin *.srec
-
-dox: eps png pdf
-
-eps: $(BUILDPATH)$(PROGRAM).eps
-png: $(BUILDPATH)$(PROGRAM).png
-pdf: $(BUILDPATH)$(PROGRAM).pdf
-
-%.eps: %.fig
-	$(FIG2DEV) -L eps $< $@
-
-%.pdf: %.fig
-	$(FIG2DEV) -L pdf $< $@
-
-%.png: %.fig
-	$(FIG2DEV) -L png $< $@
-
-
-# program the system
-program:
-#	sudo avrdude -p m2560 -P /dev/ttyACM0 -b 115200 -c stk500v2 -F -u -U flash:w:main.hex
-	#sudo avrdude -C/root/.arduino15/packages/MegaCore/hardware/avr/2.0.0/avrdude.conf -p atmega2561 -P /dev/ttyACM0 -b 19200 -c stk500v1 -F -u -U flash:w:main.hex
-	sudo avrdude -p m2561 -P /dev/ttyACM0 -b 19200 -c stk500v1 -F -u -U flash:w:$(BUILDPATH)main.hex
-
-
+	cd test && $(MAKE) clean

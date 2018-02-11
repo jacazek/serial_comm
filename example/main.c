@@ -3,7 +3,10 @@
 #define BaudRate 9600
 #define MYUBRR ((F_CPU / 16 / BaudRate ) - 1)
 
-//01101000
+void transmitComplete() {
+	transmitSerialAsync("Hello!\n", &transmitComplete);
+}
+
 int main() {
 	struct SerialSettings settings;
 	settings.baudrate = MYUBRR;
@@ -13,8 +16,4 @@ int main() {
 	while(1) {
 		
 	}
-}
-
-void transmitComplete() {
-	transmitSerialAsync("Hello!\n", &transmitComplete);
 }
