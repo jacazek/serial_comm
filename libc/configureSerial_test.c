@@ -1,4 +1,4 @@
-#include "Unity/unity.h"
+#include "../Unity/unity.h"
 #include <serialcomm.h>
 #include <common_types.h>
 #include <avr/io.h> // this is mocked

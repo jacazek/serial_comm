@@ -25,7 +25,7 @@ clean:
 	rm -rf *.o *.hex *.bin *.srec *.elf *.map *.lst
 $(PROGRAM).elf: $(PROGRAM).c
 	#$(CC) $(CFLAGS) $(LDFLAGS) $(LIBS)
-	$(CC) $(CFLAGS) $(LDFLAGS) -I$(INCLUDE) -o $@ $^ -L$(LIBS) -l$(DEPENDS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -I$(INCLUDE) -o $@ $^ -L$(LIBS) -lring_buffer -l$(DEPENDS) 
 
 lst:  $(PROGRAM).lst
 

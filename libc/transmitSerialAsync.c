@@ -37,8 +37,17 @@ void disableGlobalInterrupts() {
 	cli();
 }
 
-void transmitSerialAsync(byte bytes[], callback transmitCompleteCallback) {
+short isTransmitComplete() {
+	return UCSR0A & (1<<TXC0);
+}
+
+short isDataRegisterEmpty() {
+	return (UCSR0A & (1<<UDRE0));
+}
+
+void transmitSerialAsync(byte bytes[], callback callback) {
 	// if transmission in progress... don't do anything yet.  we will handle this later
+	transmitCompleteCallback = callback;
 	transmission = bytes;
 	transmissionLength = strlen(bytes);
 	currentPosition = 0;
@@ -64,6 +73,12 @@ ISR(USART0_UDRE_vect) {
 	Interrupt service routine for UART Transmit Complete 
 */
 ISR(USART0_TX_vect) {
-	(*transmitCompleteCallback)();
-	disableTransmitCompleteInterruptHandler();
+	// There is a possibility that when a byte is shifted out (transmit complete)
+	// that the next byte to be transmitted is not yet staged (data register empty)
+	// This means that the transmit complete interrupt will be triggered and so will the data register empty
+	// Since the data register empty interrupt runs first, it will stage a new byte and flag the register as full
+	// we should not callback to client unless the data register is empty
+	if (isDataRegisterEmpty()) {
+		(*transmitCompleteCallback)();
+	}
 }

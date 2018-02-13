@@ -1,53 +1,69 @@
-PROGRAM = serialcomm
+PROJECT = serialcomm
 MCU_TARGET     = atmega2560
-#MCU_TARGET	= atmega2561
-#MCU_TARGET     = atmega328p
-
-TESTS = serialcomm_test
-MOCKS = 
-
-INCLUDEPATH = ./include/
-SRCPATH = ./libc/
-DEPENDS = 
-BUILDPATH = ./build/
-OBJ_PATH = $(BUILDPATH)/
-DISTPATH = ./dist/
 
 
-OPTIMIZE = -O2
+DIST = ./dist/
+DIST_LIB = $(DIST)lib/
+DIST_INCLUDE = $(DIST)include/
+EXAMPLE_LIB = ./example/lib/
+EXAMPLE_INCLUDE = ./example/include/
+BUILD = ./build/
+TEST = ./test/
+MOCKS = ./test/mocks/
+DIRECTORIES = $(DIST) $(BUILD) $(TEST) $(MOCKS) $(DIST_LIB) $(DIST_INCLUDE)
+
+INCLUDE = ./include/
+LIBC = ./libc/
+SOURCE_FILES = $(filter-out $(wildcard $(LIBC)*_test.c), $(wildcard $(LIBC)*.c))
+TEST_FILES = $(patsubst $(LIBC)%,%,$(patsubst %_test.c,%_test,$(wildcard $(LIBC)*_test.c)))
+
+OPTIMIZE = -Os
+
+REMOVE = rm -rf
+MAKE_DIR = mkdir -p
+CHANGE_DIR = cd
 
 AR = avr-ar
 CC = avr-gcc
-CC_TEST = gcc
+GCC = gcc
+CFLAGS = -g -Wall $(OPTIMIZE) -ffunction-sections -mmcu=$(MCU_TARGET)
+LDFLAGS = 
+ARFLAGS = rsc
 OBJCOPY = avr-objcopy
-OBJDUMP = avr-objdump
 
-MAKE_DIR = mkdir -p
 
-# Override is only needed by avr-lib build system.
-override ARFLAGS       = rcs
-override CFLAGS        = -I$(INCLUDEPATH) -g -Wall -c $(OPTIMIZE) -mmcu=$(MCU_TARGET)
-override LDFLAGS       = -Wl,-Map,$(BUILDPATH)$(PROGRAM).map
+all: $(DIRECTORIES) $(PROJECT).a
 
-all: PATHS $(PROGRAM).a tests
-force_all: clean all
-.PHONY: force_all
-$(PROGRAM).a: $(PROGRAM).o
-	$(AR) $(ARFLAGS) $(DISTPATH)lib$@ $(BUILDPATH)*.o
 
-$(PROGRAM).o: $(SRCPATH)
-	$(CC) $(CFLAGS) $(LDFLAGS) $^*.c
-	mv *.o $(BUILDPATH)
+$(PROJECT).a: $(PROJECT).binary
+	$(AR) $(ARFLAGS) -o $(DIST_LIB)lib$@ $(BUILD)*.o
+	cp $(INCLUDE)* $(DIST_INCLUDE)
 
-PATHS:
-	$(MAKE_DIR) $(DISTPATH) $(BUILDPATH) $(TEST_BUILDPATH)
 
-tests:
-	cd test && $(MAKE) 
+$(PROJECT).binary: $(SOURCE_FILES)
+	$(CC) $(CFLAGS) -c $(LDFLAGS) $^ -I$(INCLUDE)
+	mv *.o $(BUILD)
 
-example:
-	cd example && $(MAKE)
+
+
+$(DIRECTORIES):
+	$(MAKE_DIR) $@
+
+tests: $(TEST_FILES)
+
+$(TEST_FILES): %_test: $(LIBC)%.c
+	$(GCC) -m64 -D TEST -o $(TEST)$@.o $(LIBC)$@.c $< ./Unity/unity.c -I$(MOCKS) -I$(INCLUDE)
+	$(TEST)$@.o
+
+example: example/main.c main.hex
+
+$(BUILD)main.elf: example/main.c
+	$(CC) $(CFLAGS) $(LDFLAGS) -o main.elf $< -I$(DIST_INCLUDE) -I$(EXAMPLE_INCLUDE) -L$(DIST_LIB) -L$(EXAMPLE_LIB) -lserialcomm -lring_buffer
+	mv *.elf $(BUILD)
+
+main.hex: $(BUILD)main.elf
+	$(OBJCOPY) -j .text -j .data -O ihex $< $(DIST)$@
 
 clean:
-	rm -rf $(DISTPATH) $(BUILDPATH)
-	cd test && $(MAKE) clean
+	$(REMOVE) $(DIST) $(BUILD)
+	$(REMOVE) $(TEST)*.o

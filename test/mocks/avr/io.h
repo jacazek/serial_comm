@@ -8,6 +8,10 @@
 // This may not work well for atmega8 and atmega328
 DEFINE_REGISTER(UBRR0H)
 DEFINE_REGISTER(UBRR0L)
+DEFINE_REGISTER(UCSR0A)
+#define RXC0 7
+#define TXC0 6
+#define UDRE0 5
 DEFINE_REGISTER(UCSR0B)
 #define TXCIE0 6
 #define UDRIE0 5
