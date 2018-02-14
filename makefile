@@ -6,6 +6,7 @@ DIST = ./dist/
 DIST_LIB = $(DIST)lib/
 DIST_INCLUDE = $(DIST)include/
 EXAMPLE_LIB = ./example/lib/
+EXAMPLE_LIB_AVR = ./example/lib-avr/
 EXAMPLE_INCLUDE = ./example/include/
 BUILD = ./build/
 TEST = ./test/
@@ -41,7 +42,7 @@ $(PROJECT).a: $(PROJECT).binary
 
 
 $(PROJECT).binary: $(SOURCE_FILES)
-	$(CC) $(CFLAGS) -c $(LDFLAGS) $^ -I$(INCLUDE)
+	$(CC) $(CFLAGS) -c $(LDFLAGS) $^ -I$(INCLUDE) -I$(EXAMPLE_INCLUDE) -L$(EXAMPLE_LIB_AVR)
 	mv *.o $(BUILD)
 
 
@@ -52,13 +53,13 @@ $(DIRECTORIES):
 tests: $(TEST_FILES)
 
 $(TEST_FILES): %_test: $(LIBC)%.c
-	$(GCC) -m64 -D TEST -o $(TEST)$@.o $(LIBC)$@.c $< ./Unity/unity.c -I$(MOCKS) -I$(INCLUDE)
+	$(GCC) -m64 -D TEST -o $(TEST)$@.o $(LIBC)$@.c $< ./Unity/unity.c -I$(EXAMPLE_INCLUDE) -I$(MOCKS) -I$(INCLUDE) -L$(DIST_LIB) -L$(EXAMPLE_LIB) -lring_buffer
 	$(TEST)$@.o
 
 example: example/main.c main.hex
 
 $(BUILD)main.elf: example/main.c
-	$(CC) $(CFLAGS) $(LDFLAGS) -o main.elf $< -I$(DIST_INCLUDE) -I$(EXAMPLE_INCLUDE) -L$(DIST_LIB) -L$(EXAMPLE_LIB) -lserialcomm -lring_buffer
+	$(CC) $(CFLAGS) $(LDFLAGS) -o main.elf $< -I$(DIST_INCLUDE) -I$(EXAMPLE_INCLUDE) -L$(DIST_LIB) -L$(EXAMPLE_LIB_AVR) -lserialcomm -lring_buffer-avr
 	mv *.elf $(BUILD)
 
 main.hex: $(BUILD)main.elf

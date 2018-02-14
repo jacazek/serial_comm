@@ -1,31 +1,41 @@
 #include <serialcomm.h>
-#include "./ring_buffer.h"
+#include <ring_buffer.h>
 #include <avr/io.h>
-#include <stdlib.h>
+#include <avr/interrupt.h>
 
 #define F_CPU 16000000	// 16 MHz oscillator.
 #define BaudRate 9600
 #define MYUBRR ((F_CPU / 16 / BaudRate ) - 1)
 
-static char buffer[8];
-static char flag = 0;
-
-
 void transmitComplete() {
-		transmitSerialAsync("Hello!\n", &transmitComplete);
+
+}
+
+void dataReceieved(uint8_t value) {
+	if (value == '\n' || value == '\r') {
+		flushTransmitter();
+	} else {
+		uint8_t toSend[1] = { value };
+		transmitSerialAsync(toSend, 1);
+	}
 }
 
 void configure() {
-	struct SerialSettings settings;
+	SerialTransmitterSettings transmitterSettings;
+	transmitterSettings.bufferSize = 10;
+	SerialSettings settings;
 	settings.baudrate = MYUBRR;
-	settings.TX = 1;
+	settings.RX = 1;
 	configureSerial(settings);
+	startTransmitter(transmitterSettings);
+
 }
 
 int main() {
-	RingBuffer ringBuffer = createRingBuffer(10, buffer);
 	configure();
-	transmitComplete();
+	sei();
+	startReceiver(dataReceieved);
 	while(1) {
+
 	}
 }

@@ -96,7 +96,7 @@ pdf: $(PROGRAM).pdf
 
 # program the system
 program:
-	avrdude -p m2560 -P /dev/ttyACM0 -b 115200 -c stk500v2 -U flash:w:main.hex
+	avrdude -p m2560 -P /dev/ttyACM0 -b 115200 -c stk500v2 -U flash:w:../dist/main.hex
 	#sudo avrdude -p m2561 -P /dev/ttyACM0 -b 19200 -c stk500v1 -U flash:w:$(BUILDPATH)main.hex
 
 

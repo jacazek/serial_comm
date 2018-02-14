@@ -13,6 +13,7 @@ DEFINE_REGISTER(UCSR0A)
 #define TXC0 6
 #define UDRE0 5
 DEFINE_REGISTER(UCSR0B)
+#define RXCIE0 7
 #define TXCIE0 6
 #define UDRIE0 5
 #define RXEN0 4 
