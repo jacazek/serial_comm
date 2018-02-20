@@ -11,7 +11,7 @@ typedef struct RingBuffer {
 	uint8_t capacity;
 	uint8_t filled;
 	uint8_t head;
-	char *buffer;
+	uint8_t *buffer;
 } RingBuffer;
 
 /**
@@ -34,5 +34,11 @@ extern int8_t writeRingBuffer(RingBuffer *ringBuffer, char value);
 	@param {char*} buffer The buffer to back the ring buffer
 	@return A pointer to a new ring buffer if successful
 */
-extern struct RingBuffer createRingBuffer(uint8_t capacity, char *buffer);
+extern struct RingBuffer* createRingBuffer(uint8_t capacity);
+
+/**
+	Destroy a given ring buffer
+	@param {RingBuffer*} ringBuffer The ring buffer to destroy
+*/
+extern void destroyRingBuffer(RingBuffer *ringBuffer);
 #endif

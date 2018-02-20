@@ -61,9 +61,9 @@ void GivenReceiverIsRunning_WhenStopReceiver_ThenSerialReceiveDisabled() {
 void GivenReceiverIsStopped_WhenStopReceiver_ThenSerialReceiveInerruptDisabled() {
 	startReceiver(doNothing);
 	TEST_ASSERT_BIT_HIGH(RXCIE0, UCSR0B);
-	TEST_ASSERT_EQUAL_INT8(0, stopReceiver());
+	stopReceiver();
 	TEST_ASSERT_BIT_LOW(RXCIE0, UCSR0B);
-	TEST_ASSERT_EQUAL_INT8(-1, stopReceiver());
+	stopReceiver();
 	TEST_ASSERT_BIT_LOW(RXCIE0, UCSR0B);
 }
 

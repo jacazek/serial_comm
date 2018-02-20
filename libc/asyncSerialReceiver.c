@@ -18,15 +18,12 @@ int8_t startReceiver(dataCallback clientCallback) {
 	return retval;
 }
 
-int8_t stopReceiver() {
-	int8_t retval = -1;
+void stopReceiver() {
 	if (started) {
 		UCSR0A &= ~(1<<RXC0);
 		UCSR0B &= ~(1<<RXCIE0);
-		retval = 0;
 		started = 0;
 	}
-	return retval;
 }
 
 ISR(USART0_RX_vect) {

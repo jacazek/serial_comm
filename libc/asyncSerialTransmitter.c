@@ -5,16 +5,14 @@
 #include <string.h>
 #include <stdlib.h>
 
-RingBuffer ringBuffer;
+RingBuffer* ringBuffer;
 uint8_t started = 0;
-char *buffer;
 
 
 int8_t startTransmitter(SerialTransmitterSettings settings) {
-	uint8_t retval = -1;
+	int8_t retval = -1;
 	if (!started) {
-		buffer = malloc(sizeof(char)*settings.bufferSize + 1);
-		ringBuffer = createRingBuffer(settings.bufferSize, buffer);
+		ringBuffer = createRingBuffer(settings.bufferSize);
 		UCSR0B |= (1<<TXEN0);
 		started = 1;
 		retval = 0;
@@ -22,13 +20,12 @@ int8_t startTransmitter(SerialTransmitterSettings settings) {
 	return retval;
 }
 
-int8_t stopTransmitter() {
+void stopTransmitter() {
 	if (started) {
-		free(buffer);
+		free(ringBuffer);
 		UCSR0B &= ~(1<<TXEN0);
 		started = 0;
 	}
-	return 0;
 }
 
 
@@ -37,7 +34,7 @@ int8_t transmitSerialAsync(uint8_t *value, uint8_t size) {
 	if (started) {
 		uint8_t i = 0;
 		for (i = 0; i < size; i++) {
-			writeRingBuffer(&ringBuffer, value[i]);
+			writeRingBuffer(ringBuffer, value[i]);
 		}
 		retval = i;
 	}
@@ -54,7 +51,7 @@ void enableEmptyRegisterInterruptHandler() {
 
 void stageNextByteForTransmission() {
 	char value = 0;
-	if (readRingBuffer(&ringBuffer, &value) == 0) {
+	if (readRingBuffer(ringBuffer, &value) == 0) {
 		UDR0 = value;
 	} else {
 		disableEmptyRegisterInterruptHandler();
@@ -68,7 +65,7 @@ void stageNextByteForTransmission() {
 int8_t flushTransmitter() {
 	int8_t retval = -1;
 	if (started) {
-		if (ringBuffer.filled > 0) {
+		if (ringBuffer->filled > 0) {
 			retval = 0;
 			stageNextByteForTransmission();
 			enableEmptyRegisterInterruptHandler();
@@ -81,7 +78,7 @@ int8_t flushTransmitter() {
 	Interrupt service routine for UART Transmit Data Register Empty
 */
 ISR(USART0_UDRE_vect) {
-	if (ringBuffer.filled > 0) {
+	if (ringBuffer->filled > 0) {
 		stageNextByteForTransmission();
 	} else {
 		disableEmptyRegisterInterruptHandler();
