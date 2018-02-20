@@ -41,24 +41,6 @@ void GivenSettingsWithLowBaudRate_WhenConfigureSerial_ThenBaudRateBytesSet() {
 	TEST_ASSERT_EQUAL_UINT8_MESSAGE(expectedLowByte, UBRR0L, "Baud rate low byte not set");
 }
 
-void GivenSettingsDisableReceive_WhenConfigureSerial_ReceiveDisabled() {
-	struct SerialSettings settings;
-	settings.RX = 0;
-
-	configureSerial(settings);
-
-	TEST_ASSERT_BIT_LOW(RXEN0, UCSR0B);
-}
-
-void GivenSettingsEnableReceive_WhenConfigureSerial_ReceiveEnabled() {
-	struct SerialSettings settings;
-	settings.RX = 1;
-
-	configureSerial(settings);
-
-	TEST_ASSERT_BIT_HIGH(RXEN0, UCSR0B);
-}
-
 void GivenSettings_WhenConfigureSerial_DataFrameSetTo8Bits() {
 	/* Frame format: 8data, No parity, 1stop bit */
 	struct SerialSettings settings;
@@ -102,8 +84,6 @@ int main(void) {
 	UNITY_BEGIN();
 	RUN_TEST(GivenSettingsWithHighBaudRate_WhenConfigureSerial_ThenBaudRateBytesSet);
 	RUN_TEST(GivenSettingsWithLowBaudRate_WhenConfigureSerial_ThenBaudRateBytesSet);
-	RUN_TEST(GivenSettingsEnableReceive_WhenConfigureSerial_ReceiveEnabled);
-	RUN_TEST(GivenSettingsDisableReceive_WhenConfigureSerial_ReceiveDisabled);
 	RUN_TEST(GivenSettings_WhenConfigureSerial_DataFrameSetTo8Bits);
 	RUN_TEST(GivenSettings_WhenConfigured_NoParityBit);
 	RUN_TEST(GivenSettings_WhenConfigured_AsynchronousModeEnabled);

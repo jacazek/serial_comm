@@ -11,8 +11,8 @@ int8_t startReceiver(dataCallback clientCallback) {
 	int8_t retval = -1;
 	if (!started) {
 		UCSR0B |= (1<<RXCIE0);
-		UCSR0B |= (1<<RXEN0);
 		tempCallback = clientCallback;
+		UCSR0B |= (1<<RXEN0); // could this result in an immediate interrupt?
 		retval = 0;
 		started = 1;
 	}
@@ -21,7 +21,7 @@ int8_t startReceiver(dataCallback clientCallback) {
 
 void stopReceiver() {
 	if (started) {
-		UCSR0B &= ~(1<<RXEN0);
+		UCSR0B &= ~(1<<RXEN0); // turn of the receiver first
 		UCSR0B &= ~(1<<RXCIE0);
 		tempCallback = NULL;
 		started = 0;

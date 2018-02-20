@@ -25,7 +25,6 @@ void configure() {
 	transmitterSettings.bufferSize = 10;
 	SerialSettings settings;
 	settings.baudrate = MYUBRR;
-	settings.RX = 1;
 	configureSerial(settings);
 	startTransmitter(transmitterSettings);
 
@@ -36,6 +35,6 @@ int main() {
 	sei();
 	startReceiver(dataReceieved);
 	while(1) {
-
+		
 	}
 }

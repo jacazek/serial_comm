@@ -4,8 +4,6 @@
 #include <ring_buffer.h>
 
 typedef struct SerialSettings {
-	unsigned short RX:1;
-	unsigned short reserved:6;
 	short baudrate;
 } SerialSettings;
 
